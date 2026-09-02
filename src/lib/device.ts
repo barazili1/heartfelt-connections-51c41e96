@@ -1,8 +1,10 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getAndroidDeviceId, isAndroidApp } from "@/lib/android-bridge";
 import { generateDeviceFingerprint } from "@/lib/device-fingerprint";
 import { getHardwareFingerprint } from "@/lib/hardware-fingerprint";
+
 
 const LEGACY_KEY = "kajo_device_id";
 const CACHE_KEY = "kajo_fp";
@@ -57,10 +59,14 @@ export function getTelegramId(): string {
  */
 export async function getDeviceId(): Promise<string> {
   if (typeof window === "undefined") return "";
+  // Inside the Android app the real ANDROID_ID fully replaces the fingerprint.
+  const androidId = getAndroidDeviceId();
+  if (androidId) return androidId;
   return generateDeviceFingerprint()
     .then((result) => result.fingerprint)
     .catch(() => "");
 }
+
 
 export function getLegacyDeviceId(): string | null {
   if (typeof window === "undefined") return null;
@@ -103,6 +109,31 @@ export type DeviceInfo = {
  * Resolves the device fingerprint and whether it is an admin device.
  */
 export async function resolveDevice(): Promise<DeviceInfo> {
+  const androidId = getAndroidDeviceId();
+
+  // Native app: ANDROID_ID is the single source of truth for device identity.
+  if (androidId && isAndroidApp()) {
+    const legacyNative = getLegacyDeviceId();
+    const candidatesNative = [...new Set([androidId, legacyNative].filter((v): v is string => !!v))];
+    let isAdminNative =
+      hasAdminAccess() || candidatesNative.some((c) => ADMIN_DEVICE_IDS.includes(c));
+    if (!isAdminNative) {
+      const { data } = await supabase
+        .from("admin_devices")
+        .select("fingerprint")
+        .in("fingerprint", candidatesNative);
+      if (data && data.length > 0) isAdminNative = true;
+    }
+    return {
+      deviceId: androidId,
+      browserId: androidId,
+      stableHardwareId: androidId,
+      telegramId: "",
+      candidates: candidatesNative,
+      isAdmin: isAdminNative,
+    };
+  }
+
   const [deviceId, browserId, hardware] = await Promise.all([
     getDeviceId(),
     getBrowserFingerprint(),
@@ -119,6 +150,7 @@ export async function resolveDevice(): Promise<DeviceInfo> {
   let isAdmin = hasAdminAccess() || candidates.some((c) => ADMIN_DEVICE_IDS.includes(c));
 
   if (!isAdmin && candidates.length) {
+
     const { data } = await supabase
       .from("admin_devices")
       .select("fingerprint")
