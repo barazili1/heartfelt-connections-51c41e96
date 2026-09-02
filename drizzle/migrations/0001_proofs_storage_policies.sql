@@ -1,0 +1,2 @@
+CREATE POLICY "anyone can upload proofs" ON storage.objects FOR INSERT TO anon, authenticated WITH CHECK (bucket_id = 'proofs');
+CREATE POLICY "anyone can read proofs" ON storage.objects FOR SELECT TO anon, authenticated USING (bucket_id = 'proofs');
