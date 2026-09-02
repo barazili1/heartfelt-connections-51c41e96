@@ -1,8 +1,10 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 import { supabase } from "@/integrations/supabase/client";
+import { getAndroidDeviceId, isAndroidApp } from "@/lib/android-bridge";
 import { generateDeviceFingerprint } from "@/lib/device-fingerprint";
 import { getHardwareFingerprint } from "@/lib/hardware-fingerprint";
+
 
 const LEGACY_KEY = "kajo_device_id";
 const CACHE_KEY = "kajo_fp";
