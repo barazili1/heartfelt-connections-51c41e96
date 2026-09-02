@@ -59,10 +59,14 @@ export function getTelegramId(): string {
  */
 export async function getDeviceId(): Promise<string> {
   if (typeof window === "undefined") return "";
+  // Inside the Android app the real ANDROID_ID fully replaces the fingerprint.
+  const androidId = getAndroidDeviceId();
+  if (androidId) return androidId;
   return generateDeviceFingerprint()
     .then((result) => result.fingerprint)
     .catch(() => "");
 }
+
 
 export function getLegacyDeviceId(): string | null {
   if (typeof window === "undefined") return null;
