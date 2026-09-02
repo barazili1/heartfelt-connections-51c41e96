@@ -195,3 +195,39 @@ if (webview1.canGoBack()) {
 - Android ID بيتغيّر بعد **Factory Reset** أو على جهاز مختلف، وده بيسمح بتقديم جديد.
 - الموقع والتطبيق بيستخدموا **نفس قاعدة البيانات** لأن التطبيق مجرد WebView للموقع المنشور.
 - ملفات `android-app/app/...` و `build.gradle` تخص Android Studio فقط — تجاهلها تمامًا في سكتشوير.
+
+---
+
+## 11) حل مشكلة الشاشة البيضا في سكتشوير
+
+الشاشة البيضا معناها إن الـ WebView مفتح بس الصفحة مش بتتحمّل. راجع بالترتيب:
+
+1. **الرابط**: لازم يكون رابط حقيقي منشور ويبدأ بـ `https://` — مش الجملة العربية اللي في المثال.
+   ```java
+   final String SITE_URL = "https://اسم-مشروعك.lovable.app";
+   ```
+   جرّب تفتح نفس الرابط من متصفح الموبايل الأول؛ لو مفتحش، المشكلة إن الموقع مش منشور (اضغط Publish).
+
+2. **الصلاحية**: تأكد إن `android.permission.INTERNET` مضافة فعلاً في AndroidManifest Manager. من غيرها = شاشة بيضا دايمًا.
+
+3. **JavaScript**: الموقع React، فلو `ws.setJavaScriptEnabled(true);` ناقص أو الكود اتحط في حدث غلط، الصفحة هتفضل فاضية. لازم الكود يكون في `onCreate` **بعد** ما الـ WebView اتعمل.
+
+4. **ترتيب البلوكات**: بلوك المتغير (`mUploadCallback`) لازم يكون **أول بلوك** في onCreate، وباقي الكود بعده. لو الترتيب اتقلب، الكود بيتكسر والصفحة مبتتحملش.
+
+5. **Mixed content**: خليك متأكد إن السطر ده موجود:
+   ```java
+   ws.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+   ```
+
+6. **شوف الخطأ الحقيقي**: ضيف البلوك ده في onCreate عشان أي خطأ يظهرلك كـ Toast:
+   ```java
+   webview1.setWebViewClient(new android.webkit.WebViewClient() {
+   	@Override
+   	public void onReceivedError(android.webkit.WebView view, int errorCode, String description, String failingUrl) {
+   		android.widget.Toast.makeText(getApplicationContext(), "خطأ: " + description, android.widget.Toast.LENGTH_LONG).show();
+   	}
+   });
+   ```
+   > لو ضفت ده، امسح الـ `setWebViewClient` القديم أو دمج الميثودين في كلاس واحد.
+
+7. **اختبار سريع**: بدّل مؤقتًا `SITE_URL` بـ `"https://example.com"`. لو ظهرت الصفحة → المشكلة في رابط موقعك. لو فضلت بيضا → المشكلة في الصلاحية أو الإنترنت.
