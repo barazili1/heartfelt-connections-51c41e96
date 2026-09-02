@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1788269340010,
+      "tag": "0000_create_contest_submissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788269366902,
+      "tag": "0001_proofs_storage_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788269822218,
+      "tag": "0002_create_admin_devices",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788271750525,
+      "tag": "0003_lock_device_to_single_image_pair",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788271788775,
+      "tag": "0004_enforce_one_submission_per_hardware_fingerprint",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1788337959862,
+      "tag": "0005_make_submission_reservation_atomic",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788337990655,
+      "tag": "0006_add_multi_signal_submission_locks",
+      "breakpoints": true
+    }
+  ]
+}
