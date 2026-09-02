@@ -14,63 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_devices: {
-        Row: {
-          created_at: string
-          fingerprint: string
-        }
-        Insert: {
-          created_at?: string
-          fingerprint: string
-        }
-        Update: {
-          created_at?: string
-          fingerprint?: string
-        }
-        Relationships: []
-      }
-      submissions: {
-        Row: {
-          account_image_url: string
-          created_at: string
-          device_id: string
-          hardware_id: string | null
-          id: string
-          player_id: string
-          promo_image_url: string
-          reviewed_at: string | null
-          stable_hardware_id: string | null
-          status: string
-          telegram_id: string | null
-        }
-        Insert: {
-          account_image_url: string
-          created_at?: string
-          device_id: string
-          hardware_id?: string | null
-          id?: string
-          player_id: string
-          promo_image_url: string
-          reviewed_at?: string | null
-          stable_hardware_id?: string | null
-          status?: string
-          telegram_id?: string | null
-        }
-        Update: {
-          account_image_url?: string
-          created_at?: string
-          device_id?: string
-          hardware_id?: string | null
-          id?: string
-          player_id?: string
-          promo_image_url?: string
-          reviewed_at?: string | null
-          stable_hardware_id?: string | null
-          status?: string
-          telegram_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
