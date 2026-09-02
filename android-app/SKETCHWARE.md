@@ -231,3 +231,48 @@ if (webview1.canGoBack()) {
    > لو ضفت ده، امسح الـ `setWebViewClient` القديم أو دمج الميثودين في كلاس واحد.
 
 7. **اختبار سريع**: بدّل مؤقتًا `SITE_URL` بـ `"https://example.com"`. لو ظهرت الصفحة → المشكلة في رابط موقعك. لو فضلت بيضا → المشكلة في الصلاحية أو الإنترنت.
+
+---
+
+## ⚠️ أشهر سبب للشاشة البيضا: الكود متحطوط في المكان الغلط
+
+لو ظهرلك دايالوج اسمه **"Enter string value"** وإنت بتلصق الكود فيه — ده **غلط**.
+الخانة دي بتاعة نص عادي (String)، فالكود بيتخزّن كنص ومش بيتنفّذ أبدًا → شاشة بيضا.
+
+### الطريقة الصحيحة
+1. اضغط **Cancel** في دايالوج `Enter string value`.
+2. من قائمة البلوكات افتح قسم **More block** واختار بلوك **Add Source Directly**.
+3. حط البلوك ده **جوه `onCreate`**.
+4. ألصق الكود جوه بلوك `Add Source Directly` (مش في خانة String).
+5. اتأكد من إضافة صلاحية **INTERNET** من `Manifest → Permissions`.
+6. اعمل **Run**.
+
+### الكود الأساسي (نسخة مختصرة تشتغل فورًا)
+
+```java
+final String SITE_URL = "https://champion-1.lovable.app";
+
+android.webkit.WebSettings ws = webview1.getSettings();
+ws.setJavaScriptEnabled(true);
+ws.setDomStorageEnabled(true);
+ws.setDatabaseEnabled(true);
+ws.setLoadWithOverviewMode(true);
+ws.setUseWideViewPort(true);
+ws.setMixedContentMode(android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+
+webview1.addJavascriptInterface(new Object() {
+	@android.webkit.JavascriptInterface
+	public String getAndroidId() {
+		return android.provider.Settings.Secure.getString(
+			getContentResolver(),
+			android.provider.Settings.Secure.ANDROID_ID);
+	}
+}, "KajoAndroid");
+
+webview1.setWebViewClient(new android.webkit.WebViewClient());
+webview1.setWebChromeClient(new android.webkit.WebChromeClient());
+webview1.loadUrl(SITE_URL);
+```
+
+> رابط الموقع المنشور الحالي: `https://champion-1.lovable.app` (تم التأكد إنه شغال ✅)
+> ولازم اسم الجسر يفضل `KajoAndroid` بالظبط عشان الموقع يقراه.
